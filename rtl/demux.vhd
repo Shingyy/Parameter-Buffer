@@ -14,24 +14,10 @@ entity demux is
 end entity demux;
 
 architecture rtl of demux is
-    signal counter: unsigned(N-1 downto 0):= to_unsigned(0,N);
     signal demux_signal: unsigned(2**N -1 downto 0);
-begin
-    loop_proc: process (SEL) is
-    begin
-        if RESET= '0' then
-            for i in 0 to 2**N-1 loop
-                if counter= SEL then
-                    exit;
-                else
-                    counter<= counter + to_unsigned(1,N);
-                    demux_signal<= shift_left(demux_signal,1);
-                end if;
-            end loop; 
-        else
-            demux_signal<= to_unsigned(1, 2**N);            
-        end if;
-    end process;
-    DEMUX_OUT<= std_logic_vector(demux_signal);
-    
+begin  
+    demux_signal<= shift_left(to_unsigned(1, 2**N),to_integer(SEL));--shift to the left SEL times 
+
+    DEMUX_OUT<= std_logic_vector(demux_signal) when RESET='0' else-- Active high reset 
+                std_logic_vector(to_unsigned(1, 2**N));
 end architecture rtl;
